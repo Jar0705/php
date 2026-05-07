@@ -43,7 +43,7 @@ error_reporting(E_ALL);
             <th>Aksi</th>
         </tr>
         <?php
-        $data = mysqli_query($koneksi, "SELECT * FROM users");
+        $data = mysqli_query($koneksi, "SELECT * FROM user");
         while($d = mysqli_fetch_array($data)){
         ?>
         <tr>
