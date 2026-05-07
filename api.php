@@ -11,9 +11,17 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 /*
 |--------------------------------------------------------------------------
+| AMBIL BODY JSON
+|--------------------------------------------------------------------------
+*/
+
+$inputJSON = file_get_contents("php://input");
+$input = json_decode($inputJSON, true);
+
+/*
+|--------------------------------------------------------------------------
 | GET ALL DATA
 |--------------------------------------------------------------------------
-| GET /api.php
 */
 
 if($method == "GET" && !isset($_GET['id'])){
@@ -37,9 +45,8 @@ if($method == "GET" && !isset($_GET['id'])){
 
 /*
 |--------------------------------------------------------------------------
-| GET SINGLE DATA
+| GET DETAIL
 |--------------------------------------------------------------------------
-| GET /api.php?id=1
 */
 
 if($method == "GET" && isset($_GET['id'])){
@@ -55,7 +62,6 @@ if($method == "GET" && isset($_GET['id'])){
 
     echo json_encode([
         "status" => true,
-        "message" => "Detail user",
         "data" => $data
     ]);
 
@@ -64,20 +70,30 @@ if($method == "GET" && isset($_GET['id'])){
 
 /*
 |--------------------------------------------------------------------------
-| INSERT DATA
+| POST
 |--------------------------------------------------------------------------
-| POST /api.php
 */
 
 if($method == "POST"){
 
-    $nama  = $_POST['nama'];
-    $sandi = $_POST['sandi'];
+    // Bisa dari form-data / x-www-form-urlencoded
+    $nama  = $_POST['nama'] ?? $input['nama'] ?? '';
+    $sandi = $_POST['sandi'] ?? $input['sandi'] ?? '';
+
+    if(empty($nama) || empty($sandi)){
+
+        echo json_encode([
+            "status" => false,
+            "message" => "Nama atau sandi kosong"
+        ]);
+
+        exit;
+    }
 
     $insert = mysqli_query(
         $koneksi,
         "INSERT INTO user(nama, sandi)
-         VALUES('$nama', '$sandi')"
+         VALUES('$nama','$sandi')"
     );
 
     if($insert){
@@ -91,7 +107,7 @@ if($method == "POST"){
 
         echo json_encode([
             "status" => false,
-            "message" => "Gagal tambah data"
+            "message" => mysqli_error($koneksi)
         ]);
     }
 
@@ -100,18 +116,38 @@ if($method == "POST"){
 
 /*
 |--------------------------------------------------------------------------
-| UPDATE DATA
+| PUT
 |--------------------------------------------------------------------------
-| PUT /api.php?id=1
 */
 
 if($method == "PUT"){
 
-    parse_str(file_get_contents("php://input"), $_PUT);
+    $id = $_GET['id'] ?? '';
 
-    $id    = $_GET['id'];
-    $nama  = $_PUT['nama'];
-    $sandi = $_PUT['sandi'];
+    // SUPPORT JSON
+    if($input){
+
+        $nama  = $input['nama'] ?? '';
+        $sandi = $input['sandi'] ?? '';
+
+    }else{
+
+        // SUPPORT x-www-form-urlencoded
+        parse_str($inputJSON, $putData);
+
+        $nama  = $putData['nama'] ?? '';
+        $sandi = $putData['sandi'] ?? '';
+    }
+
+    if(empty($id)){
+
+        echo json_encode([
+            "status" => false,
+            "message" => "ID wajib diisi"
+        ]);
+
+        exit;
+    }
 
     $update = mysqli_query(
         $koneksi,
@@ -132,7 +168,7 @@ if($method == "PUT"){
 
         echo json_encode([
             "status" => false,
-            "message" => "Gagal update data"
+            "message" => mysqli_error($koneksi)
         ]);
     }
 
@@ -141,9 +177,8 @@ if($method == "PUT"){
 
 /*
 |--------------------------------------------------------------------------
-| DELETE DATA
+| DELETE
 |--------------------------------------------------------------------------
-| DELETE /api.php?id=1
 */
 
 if($method == "DELETE"){
@@ -166,12 +201,18 @@ if($method == "DELETE"){
 
         echo json_encode([
             "status" => false,
-            "message" => "Gagal hapus data"
+            "message" => mysqli_error($koneksi)
         ]);
     }
 
     exit;
 }
+
+/*
+|--------------------------------------------------------------------------
+| METHOD TIDAK VALID
+|--------------------------------------------------------------------------
+*/
 
 echo json_encode([
     "status" => false,
