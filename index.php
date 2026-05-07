@@ -21,7 +21,6 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// CREATE
 if(isset($_POST['tambah'])){
     $nama = $_POST['nama'];
     $sandi = $_POST['sandi'];
@@ -31,7 +30,6 @@ if(isset($_POST['tambah'])){
          VALUES('$nama', '$sandi')");
 }
 
-// DELETE
 if(isset($_GET['hapus'])){
     $id = $_GET['hapus'];
 
