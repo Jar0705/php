@@ -34,7 +34,7 @@ error_reporting(E_ALL);
     }
     ?>
 
-    <h2>Data Users</h2>
+    <h2>Data User</h2>
     <table border="1">
         <tr>
             <th>ID</th>
