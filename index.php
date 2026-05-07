@@ -64,6 +64,7 @@ while($d = mysqli_fetch_array($data)){
     <td><?php echo $d['nama']; ?></td>
     <td><?php echo $d['sandi']; ?></td>
     <td>
+        <a href="edit.php?id=<?php echo $d['id']; ?>">Edit</a> |
         <a href="index.php?hapus=<?php echo $d['id']; ?>">
             Hapus
         </a>
