@@ -9,8 +9,11 @@ $port = getenv('MYSQLPORT') ?: 3306;
 
 $koneksi = mysqli_connect($host, $user, $pass, $db, $port);
 
-if (!$koneksi) {
-    // Menampilkan error yang lebih spesifik jika gagal
-    die("Koneksi gagal: " . mysqli_connect_error());
+
+if(!$koneksi){
+    die(json_encode([
+        "status" => false,
+        "message" => "Koneksi database gagal"
+    ]));
 }
 ?>
